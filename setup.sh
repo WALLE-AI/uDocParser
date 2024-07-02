@@ -1,0 +1,1 @@
+python deepdoc/vision/t_ocr.py --input test.png
