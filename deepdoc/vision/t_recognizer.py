@@ -21,7 +21,7 @@ sys.path.insert(
 
 from deepdoc.vision.seeit import draw_box
 from deepdoc.vision import Recognizer, LayoutRecognizer, TableStructureRecognizer, OCR, init_in_out
-from api.utils.file_utils import get_project_base_directory
+from utils.file_utils import get_project_base_directory
 import argparse
 import re
 import numpy as np
@@ -47,6 +47,7 @@ def main(args):
         if args.mode.lower() == "tsr":
             #lyt = [t for t in lyt if t["type"] == "table column"]
             html = get_table_html(images[i], lyt, ocr)
+            print(html)
             with open(outputs[i] + ".html", "w+") as f:
                 f.write(html)
             lyt = [{
@@ -61,6 +62,7 @@ def main(args):
 
 def get_table_html(img, tb_cpns, ocr):
     boxes = ocr(np.array(img))
+    ##有限Y轴方向排序
     boxes = Recognizer.sort_Y_firstly(
         [{"x0": b[0][0], "x1": b[1][0],
           "top": b[0][1], "text": t[0],
@@ -112,62 +114,62 @@ def get_table_html(img, tb_cpns, ocr):
             b["H_left"] = spans[ii]["x0"]
             b["H_right"] = spans[ii]["x1"]
             b["SP"] = ii
+    return TableStructureRecognizer.construct_table(boxes, html=False)
+#     html = """
+#     <html>
+#     <head>
+#     <style>
+#     ._table_1nkzy_11 {
+#       margin: auto;
+#       width: 70%%;
+#       padding: 10px;
+#     }
+#     ._table_1nkzy_11 p {
+#       margin-bottom: 50px;
+#       border: 1px solid #e1e1e1;
+#     }
 
-    html = """
-    <html>
-    <head>
-    <style>
-    ._table_1nkzy_11 {
-      margin: auto;
-      width: 70%%;
-      padding: 10px;
-    }
-    ._table_1nkzy_11 p {
-      margin-bottom: 50px;
-      border: 1px solid #e1e1e1;
-    }
+#     caption {
+#       color: #6ac1ca;
+#       font-size: 20px;
+#       height: 50px;
+#       line-height: 50px;
+#       font-weight: 600;
+#       margin-bottom: 10px;
+#     }
 
-    caption {
-      color: #6ac1ca;
-      font-size: 20px;
-      height: 50px;
-      line-height: 50px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
+#     ._table_1nkzy_11 table {
+#       width: 100%%;
+#       border-collapse: collapse;
+#     }
 
-    ._table_1nkzy_11 table {
-      width: 100%%;
-      border-collapse: collapse;
-    }
+#     th {
+#       color: #fff;
+#       background-color: #6ac1ca;
+#     }
 
-    th {
-      color: #fff;
-      background-color: #6ac1ca;
-    }
+#     td:hover {
+#       background: #c1e8e8;
+#     }
 
-    td:hover {
-      background: #c1e8e8;
-    }
+#     tr:nth-child(even) {
+#       background-color: #f2f2f2;
+#     }
 
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
-    ._table_1nkzy_11 th,
-    ._table_1nkzy_11 td {
-      text-align: center;
-      border: 1px solid #ddd;
-      padding: 8px;
-    }
-    </style>
-    </head>
-    <body>
-    %s
-    </body>
-    </html>
-""" % TableStructureRecognizer.construct_table(boxes, html=True)
-    return html
+#     ._table_1nkzy_11 th,
+#     ._table_1nkzy_11 td {
+#       text-align: center;
+#       border: 1px solid #ddd;
+#       padding: 8px;
+#     }
+#     </style>
+#     </head>
+#     <body>
+#     %s
+#     </body>
+#     </html>
+# """ % TableStructureRecognizer.construct_table(boxes, html=True)
+#     return html
 
 
 if __name__ == "__main__":

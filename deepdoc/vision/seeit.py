@@ -25,6 +25,13 @@ def save_results(image_list, results, labels, output_dir='output/', threshold=0.
         out_path = os.path.join(output_dir, f"{idx}.jpg")
         im.save(out_path, quality=95)
         print("save result to: " + out_path)
+        
+        
+def crop_image(im,bbox,label):
+    '''
+    根据bbox位置裁剪出figure图片和table的数据
+    '''
+    pass
 
 
 def draw_box(im, result, lables, threshold=0.5):

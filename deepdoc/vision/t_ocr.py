@@ -27,6 +27,8 @@ import argparse
 import numpy as np
 
 
+
+
 def main(args):
     ocr = OCR()
     images, outputs = init_in_out(args)
