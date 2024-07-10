@@ -76,14 +76,31 @@ class FileData(BaseModel):
       total_page_num:总页码数
       stadard_label:属于建筑那个大类，比如防水工程、建筑电气
     }
-    
     '''
     file_id:int
     file_name:str="广东省市政基础设施工程竣工验收技术资料统一用表（2019版）"
     file_path_url:str="http:10.5.12.45/pdf/广东省市政基础设施工程竣工验收技术资料统一用表（2019版）.pdf"
     position_standard:List[str]=["广东省"]
     total_page_num:int
-    standard_label:List[str]=["防水工程","建筑电气"]
+    
+  
+class FileDataInforation(BaseModel):
+    '''
+    File Data Information
+    {
+        file_name:"厂矿道路设计规范"
+        standard_num: GB50108—2008
+        standard_position_label:"国家标准"
+        effective_date: "2009年4月1日"
+        discard_data:"GB50108—2001"
+    }
+    '''
+    file_name:str = "厂矿道路设计规范"
+    standard_num: str = "GB50108—2008"
+    standard_position_label: str = "国家标准"
+    effective_date: str = "2009年4月1日"
+    discard_standard_num: str = "GB50108—2001"
+    
     
     
     

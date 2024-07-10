@@ -27,6 +27,7 @@ Cargo.lock
 pdf_downloads/*.pdf
 rename_pdf_test/*.pdf
 pdf_downloads_new/*.pdf
+no_disk_pdf/*.pdf
 models
 
 # Exclude Mac generated files
