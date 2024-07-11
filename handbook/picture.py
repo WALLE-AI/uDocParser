@@ -15,7 +15,7 @@ import io
 import numpy as np
 from PIL import Image
 
-from db import LLMType
+# from db import LLMType
 # from api.db.services.llm_service import LLMBundle
 from llm import tokenize
 from vision import OCR

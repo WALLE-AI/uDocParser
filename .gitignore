@@ -28,6 +28,8 @@ models
 *.pdf
 *.png
 *.jpg
+*.pptx
+*.doc
 
 
 

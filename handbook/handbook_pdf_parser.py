@@ -143,6 +143,7 @@ def chunk(filename, binary=None, from_page=0, to_page=100000,
 
     # is it English
     # is_english(random_choices([t for t, _ in sections], k=218))
+    #TODO:需要chunk关联对应表格和图片
     eng = lang.lower() == "english"
 
     res = tokenize_table(tbls, doc, eng)
@@ -153,13 +154,13 @@ def chunk(filename, binary=None, from_page=0, to_page=100000,
 def test_pdf_parser_chunk():
     def dummy(prog=None, msg=""):
         pass
-    test_pdf = "examples/rename_pdf_test/北京市地方标准：房屋建筑使用安全检查技术规程.pdf"
+    test_pdf = "examples/doc_test/《低压配电设计规范》GB 50054-2011.pdf"
     chunk(test_pdf,from_page=1, to_page=10, callback=dummy)
 
 
-if __name__ == "__main__":
-    import sys
-
-    def dummy(prog=None, msg=""):
-        pass
-    chunk(sys.argv[1], from_page=1, to_page=10, callback=dummy)
+# if __name__ == "__main__":
+#     import sys
+#
+#     def dummy(prog=None, msg=""):
+#         pass
+#     chunk(sys.argv[1], from_page=1, to_page=10, callback=dummy)
