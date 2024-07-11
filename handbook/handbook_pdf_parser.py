@@ -153,7 +153,7 @@ def chunk(filename, binary=None, from_page=0, to_page=100000,
 def test_pdf_parser_chunk():
     def dummy(prog=None, msg=""):
         pass
-    test_pdf = "D:/LLM/需求梳理/datasets/建筑行业施工与安全标准/2、GB50108-2008地下工程防水技术规范.pdf"
+    test_pdf = "examples/rename_pdf_test/北京市地方标准：房屋建筑使用安全检查技术规程.pdf"
     chunk(test_pdf,from_page=1, to_page=10, callback=dummy)
 
 

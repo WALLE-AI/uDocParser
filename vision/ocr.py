@@ -567,7 +567,7 @@ class OCR(object):
             time_dict['all'] = end - start
             return None, None, time_dict
         else:
-            ron_logger.debug("dt_boxes num : {}, elapsed : {}".format(
+            cron_logger.debug("dt_boxes num : {}, elapsed : {}".format(
                 len(dt_boxes), elapse))
 
         return zip(self.sorted_boxes(dt_boxes), [
