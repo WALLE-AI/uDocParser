@@ -23,7 +23,7 @@ import numpy as np
 import onnxruntime as ort
 
 from .postprocess import build_post_process
-from utils.settings import cron_logger
+from settings import cron_logger
 
 
 def transform(data, ops=None):

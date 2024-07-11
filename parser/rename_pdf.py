@@ -1,91 +1,20 @@
 import os
 import sys
-sys.path.insert(
-    0,
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(
-                os.path.abspath(__file__)),
-            '../../')))
+# sys.path.insert(
+#     0,
+#     os.path.abspath(
+#         os.path.join(
+#             os.path.dirname(
+#                 os.path.abspath(__file__)),
+#             '../../')))
 import pdfplumber
 from loguru import logger
-from llm import LLMApi
-from deepdoc.vision import OCR
+from llm.llm import LLMApi
+from llm.prompt.prompt_pdf_parser import PROMPT_RENAME_TEMPLATE, STANDARD_LABEL, FILE_PDF_JSON_FORMATH
+from vision import OCR
 import numpy as np
 import pandas as pd
 import json
-
-STANDARD_LABEL=[
-"地基与基础",
-"主体结构",
-"建筑装饰装修",
-"防水工程",
-"建筑给排水",
-"建筑电气",
-"通风与空调",
-"建筑智能",
-"建筑节能",
-"屋面工程",
-"临建工程",
-"路面工程(公路)",
-"路基工程(公路)",
-"下部构造(公路)",
-"上部构造(公路)",
-"防护工程(公路)",
-"路面工程(市政)",
-"路基工程(市政)",
-"人行道(市政)",
-"附属构筑物(市政)",
-"下部构造(市政)",
-"上部构造(市政)",
-"桥面系(市政)",
-"防护工程(市政)",
-"给排水工程土方工程(市政)",
-"给排水工程附屈构筑物工程(市政)",
-"管廊工程(市政)",
-"园林工程",
-"房建工程",
-"地铁车站",
-"防水工程(地铁)",
-"模板工程(地铁)",
-"钢筋工程(地铁)",
-"混凝土工程(地铁)",
-"隧道工程(铁路)",
-"线路及轨道工程(铁路)",
-"下部结构(铁路)",
-"上部结构(铁路)",
-"路基工程(铁路)",
-"水泥砂浆",
-"交安工程(公路、市政)",
-"地下通道及空间(市政)"
-]
-
-FILE_PDF_JSON_FORMATH= {
-    "文件名称":"xxx",
-    "标准号":"xxx",
-    "废弃标准":"xxx",
-    "国家标准":"xxxx",
-    "地方标准":"xx省/xx市/xx区",
-    "实施时间":"xxx" ,
-    "废弃时间":"xxx",
-    "建筑标准类别":"xxx选择用户输入standard_label中某项类别"
-}
-
-PROMPT_RENAME_TEST = '''
-你能够根据用户的提供的内容，高质量的信息抽取出结构化知识和识别建筑行业类别，如下为用户输入：\n 建筑标准类别：{standard_label}\n 用户输入：{text}\n 采用json格式信息抽取出,如格式 文件名称:xxx,标准号：xxx, 废弃标准：xxx,国家标准:xxxx,地方标准：xx省/xx市/xx区,实施时间：xxx ,废弃时间：xxx,建筑标准类别：xxx 格式的内容输出，建筑行业类别需要根据用户提供的类别进行识别后输出，不要幻觉生成，如果没有相关信息或者无法识别，输出为""
-'''
-
-PROMPT_RENAME_TEMPLATE='''
-你能够根据用户的提供的内容，高质量的进行信息抽取和结构化知识，同时能够清晰的识别出所在建筑标准类别 
-用户输入：{text}\n
-建筑标准类别：{standard_label}\n
-  
-你需要使用如下json格式输出内容:
-{file_rename_json_format}\n
-
-对于建筑标准类别需要根据用户提供的类别进行识别后输出，不要幻觉生成，如果没有相关信息或者无法识别，输出为""
-
-'''
 
 
 
@@ -162,13 +91,12 @@ class RenamePDF():
         result_response = LLMApi.call_llm(prompt_input)
         logger.info(f"prompt input:{prompt_input}")
         return  LLMApi.llm_result_postprocess(result_response)
-    
-    
-if __name__ =="__main__":
+
+def test_rename_pdf():
     test_pdf = "D:/LLM/需求梳理/datasets/建筑行业施工与安全标准/2、GB50108-2008地下工程防水技术规范.pdf"
-    pdf_dir = "D:\\LLM\\project\\uDocParser\\rename_pdf_test"
+    pdf_dir = "examples/rename_pdf_test"
     local_test = "D:/LLM/project/uDocParser/rename_pdf_test/江苏省工程建设标准 DGJ32TJ60-2007.pdf"
-    save_path = "test.csv"
+    save_path = "examples/rename_pdf_test/test.csv"
     pdf_files_path_dict= list_pdf_files_in_directory(pdf_dir)
     save_data_list = []
     for key,values in pdf_files_path_dict.items():
@@ -181,6 +109,10 @@ if __name__ =="__main__":
             save_data_list.append(response_result)
     save_data = pd.DataFrame(save_data_list)
     save_data.to_csv(save_path,index=False)
+    
+if __name__ =="__main__":
+    test_rename_pdf()
+
             
             
             

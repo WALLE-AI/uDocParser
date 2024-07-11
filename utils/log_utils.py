@@ -21,7 +21,7 @@ import inspect
 from logging.handlers import TimedRotatingFileHandler
 from threading import RLock
 
-import utils.file_utils
+from utils import file_utils
 
 
 class LoggerFactory(object):

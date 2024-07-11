@@ -3,7 +3,8 @@ import os
 import threading
 import httpx
 
-from llm_config import MODEL_NAME_LIST
+from llm.llm_config import MODEL_NAME_LIST
+
 
 class LLMApi():
     def __init__(self) -> None:

@@ -11,7 +11,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from rag.nlp import find_codec
+from llm import find_codec
 import readability
 import html_text
 import chardet

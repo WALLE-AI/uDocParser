@@ -15,7 +15,7 @@ from openpyxl import load_workbook
 import sys
 from io import BytesIO
 
-from rag.nlp import find_codec
+from llm import find_codec
 
 
 class RAGFlowExcelParser:

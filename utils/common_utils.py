@@ -30,7 +30,7 @@ from Cryptodome.Cipher import PKCS1_v1_5 as Cipher_pkcs1_v1_5
 
 from filelock import FileLock
 
-from . import file_utils
+from utils import file_utils
 
 SERVICE_CONF = "service_conf.yaml"
 

@@ -24,11 +24,12 @@ Cargo.lock
 *.txt
 .idea/
 .vscode/
-pdf_downloads/*.pdf
-rename_pdf_test/*.pdf
-pdf_downloads_new/*.pdf
-no_disk_pdf/*.pdf
 models
+*.pdf
+*.png
+*.jpg
+
+
 
 # Exclude Mac generated files
 .DS_Store
