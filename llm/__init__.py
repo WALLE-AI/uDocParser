@@ -26,6 +26,89 @@ from word2number import w2n
 from cn2an import cn2an
 from PIL import Image
 
+
+
+#
+#  Copyright 2024 The InfiniFlow Authors. All Rights Reserved.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+from .embedding_model import *
+from .chat_model import *
+from .cv_model import *
+from .rerank_model import *
+
+
+EmbeddingModel = {
+    "Ollama": OllamaEmbed,
+    "OpenAI": OpenAIEmbed,
+    "Azure-OpenAI": AzureEmbed,
+    "Xinference": XinferenceEmbed,
+    "Tongyi-Qianwen": QWenEmbed,
+    "ZHIPU-AI": ZhipuEmbed,
+    "FastEmbed": FastEmbed,
+    "Youdao": YoudaoEmbed,
+    "BaiChuan": BaiChuanEmbed,
+    "Jina": JinaEmbed,
+    "BAAI": DefaultEmbedding,
+    "Mistral": MistralEmbed,
+    "Bedrock": BedrockEmbed,
+    "Gemini":GeminiEmbed
+}
+
+
+CvModel = {
+    "OpenAI": GptV4,
+    "Azure-OpenAI": AzureGptV4,
+    "Ollama": OllamaCV,
+    "Xinference": XinferenceCV,
+    "Tongyi-Qianwen": QWenCV,
+    "ZHIPU-AI": Zhipu4V,
+    "Moonshot": LocalCV,
+    'Gemini':GeminiCV
+}
+
+
+ChatModel = {
+    "OpenAI": GptTurbo,
+    "Azure-OpenAI": AzureChat,
+    "ZHIPU-AI": ZhipuChat,
+    "Tongyi-Qianwen": QWenChat,
+    "Ollama": OllamaChat,
+    "Xinference": XinferenceChat,
+    "Moonshot": MoonshotChat,
+    "DeepSeek": DeepSeekChat,
+    "VolcEngine": VolcEngineChat,
+    "BaiChuan": BaiChuanChat,
+    "MiniMax": MiniMaxChat,
+    "Mistral": MistralChat,
+    'Gemini' : GeminiChat,
+    "Bedrock": BedrockChat,
+    "Groq": GroqChat
+}
+
+
+RerankModel = {
+    "BAAI": DefaultRerank,
+    "Jina": JinaRerank,
+    "Youdao": YoudaoRerank,
+    "Xinference": XInferenceRerank
+}
+
+
+
+
+
 all_codecs = [
     'utf-8', 'gb2312', 'gbk', 'utf_16', 'ascii', 'big5', 'big5hkscs',
     'cp037', 'cp273', 'cp424', 'cp437',
@@ -594,3 +677,7 @@ Answer format: (in language of user's question)
     kwd = chat_mdl.chat(prompt, [{"role": "user", "content": content}], {"temperature": 0.2})
     if isinstance(kwd, tuple): return kwd[0]
     return kwd
+
+
+
+
