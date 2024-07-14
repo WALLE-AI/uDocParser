@@ -128,7 +128,7 @@ def load_json_conf_real_time(conf_path):
 
 def load_yaml_conf(conf_path):
     if not os.path.isabs(conf_path):
-        conf_path = os.path.join(get_project_base_directory(), conf_path)
+        conf_path = os.path.join(get_project_base_directory(),conf_path)
     try:
         with open(conf_path) as f:
             yaml = YAML(typ='safe', pure=True)

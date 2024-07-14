@@ -29,8 +29,8 @@ from FlagEmbedding import FlagModel
 import torch
 import numpy as np
 import asyncio
-from api.utils.file_utils import get_home_cache_dir
-from rag.utils import num_tokens_from_string, truncate
+from utils.file_utils import get_home_cache_dir
+from utils import num_tokens_from_string, truncate
 import google.generativeai as genai 
 
 class Base(ABC):

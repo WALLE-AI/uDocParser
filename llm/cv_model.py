@@ -24,7 +24,7 @@ import os
 import base64
 from io import BytesIO
 
-from utils import get_uuid
+from utils.common_utils import get_uuid
 from utils.file_utils import get_project_base_directory
 
 

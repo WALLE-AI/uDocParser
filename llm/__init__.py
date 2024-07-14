@@ -94,7 +94,8 @@ ChatModel = {
     "Mistral": MistralChat,
     'Gemini' : GeminiChat,
     "Bedrock": BedrockChat,
-    "Groq": GroqChat
+    "Groq": GroqChat,
+    "Openrouter":OpenrouterClient
 }
 
 

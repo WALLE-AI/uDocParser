@@ -12,7 +12,8 @@ MODEL_NAME_LIST = {
         "meta-llama/llama-3-8b-instruct:free":"meta-llama/llama-3-8b-instruct:free",
         "microsoft/phi-3-medium-4k-instruct":"microsoft/phi-3-medium-4k-instruct",
         "meta-llama/llama-3-70b-instruct":"meta-llama/llama-3-70b-instruct",
-        "mistralai/mistral-7b-instruct":"mistralai/mistral-7b-instruct"
+        "mistralai/mistral-7b-instruct":"mistralai/mistral-7b-instruct",
+        "openai/gpt-4o":"openai/gpt-4o"
     },
     "siliconflow":{
         "Qwen/Qwen2-7B-Instruct":"Qwen/Qwen2-7B-Instruct",

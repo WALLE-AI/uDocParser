@@ -65,7 +65,7 @@ class LLMApi():
     
     
 if __name__ == "__main__":
-    result = LLMApi.call_llm("你是谁")
+    result = LLMApi.call_llm("你是谁",llm_type="openrouter",model_name="openai/gpt-4o")
     result = LLMApi.llm_result_postprocess(result)
     print(result)
 
