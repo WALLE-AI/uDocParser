@@ -75,7 +75,8 @@ CvModel = {
     "Tongyi-Qianwen": QWenCV,
     "ZHIPU-AI": Zhipu4V,
     "Moonshot": LocalCV,
-    'Gemini':GeminiCV
+    'Gemini':GeminiCV,
+    "OpenrouterClientCV":OpenrouterClientCV
 }
 
 

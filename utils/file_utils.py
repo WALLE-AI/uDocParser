@@ -37,6 +37,8 @@ class FileType(StrEnum):
 PROJECT_BASE = os.getenv("RAG_PROJECT_BASE") or os.getenv("RAG_DEPLOY_BASE")
 RAG_BASE = os.getenv("RAG_BASE")
 
+MODEL_DIR = "D:\\WALLE-AI\\models"
+
 
 def get_project_base_directory(*args):
     global PROJECT_BASE
@@ -75,7 +77,7 @@ def get_rag_python_directory(*args):
 
 
 def get_home_cache_dir():
-    dir = os.path.join(os.path.expanduser('~'), ".ragflow")
+    dir = os.path.join(MODEL_DIR, ".ragflow")
     try:
         os.mkdir(dir)
     except OSError as error:

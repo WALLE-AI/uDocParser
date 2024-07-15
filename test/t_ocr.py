@@ -21,8 +21,8 @@ sys.path.insert(
                 os.path.abspath(__file__)),
             '../../')))
 
-from deepdoc.vision.seeit import draw_box
-from deepdoc.vision import OCR, init_in_out
+from vision.seeit import draw_box
+from vision import OCR, init_in_out
 import argparse
 import numpy as np
 
