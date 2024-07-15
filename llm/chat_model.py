@@ -76,9 +76,16 @@ class Base(ABC):
 
 
 class OpenrouterClient(Base):
-    def __init__(self, key, model_name="meta-llama/llama-3-70b-instruct", base_url="ttps://openrouter.ai/api/v1"):
+    def __init__(self, key, model_name="meta-llama/llama-3-70b-instruct", base_url="https://openrouter.ai/api/v1"):
         if not base_url: base_url="https://openrouter.ai/api/v1"
         if not key:key=os.environ.get("OPENROUTER_API_KEY")
+        super().__init__(key, model_name, base_url)
+
+
+class SiliconflowClient(Base):
+    def __init__(self, key, model_name="Qwen/Qwen2-7B-Instruct", base_url="https://api.siliconflow.cn/v1"):
+        if not base_url: base_url="https://api.siliconflow.cn/v1"
+        if not key:key=os.environ.get("SILICONFLOW_API_KEY")
         super().__init__(key, model_name, base_url)
 
 
