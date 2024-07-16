@@ -18,7 +18,7 @@ import re
 from parser.pdf_parser import PlainParser
 from llm import rag_tokenizer, naive_merge, tokenize_table, tokenize_chunks, find_codec, concat_img, naive_merge_docx, tokenize_chunks_docx
 from parser import PdfParser, ExcelParser, DocxParser, HtmlParser, JsonParser, MarkdownParser
-from settings import cron_logger
+from utils.settings import cron_logger
 from utils import num_tokens_from_string
 from PIL import Image
 from functools import reduce

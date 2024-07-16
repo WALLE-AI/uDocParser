@@ -10,18 +10,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-import copy
 from tika import parser
 import re
 from io import BytesIO
 from docx import Document
 
 from db import ParserType
-from llm import bullets_category, is_english, tokenize, remove_contents_table, hierarchical_merge, \
-    make_colon_as_title, add_positions, tokenize_chunks, find_codec, docx_question_level
+from llm import bullets_category, remove_contents_table, hierarchical_merge, \
+    make_colon_as_title, tokenize_chunks, find_codec, docx_question_level
 from llm import rag_tokenizer
 from parser import PdfParser, DocxParser, PlainParser, HtmlParser
-from settings import cron_logger
+from utils.settings import cron_logger
 
 
 class Docx(DocxParser):

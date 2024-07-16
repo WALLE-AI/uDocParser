@@ -21,7 +21,7 @@ import requests
 from llm import rag_tokenizer
 from parser.resume import refactor
 from parser.resume import step_one, step_two
-from settings import cron_logger
+from utils.settings import cron_logger
 from utils import rmSpace
 
 forbidden_select_fields4resume = [

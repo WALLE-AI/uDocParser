@@ -155,7 +155,7 @@ def test_pdf_parser_chunk():
     def dummy(prog=None, msg=""):
         pass
     test_pdf = "examples/doc_test/702-104D702-1常用低压配电设备安装.pdf"
-    chunk(test_pdf,from_page=1, to_page=5, callback=dummy)
+    chunk(test_pdf,from_page=1, to_page=15, callback=dummy)
 
 
 # if __name__ == "__main__":
