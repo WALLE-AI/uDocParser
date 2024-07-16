@@ -154,8 +154,8 @@ def chunk(filename, binary=None, from_page=0, to_page=100000,
 def test_pdf_parser_chunk():
     def dummy(prog=None, msg=""):
         pass
-    test_pdf = "examples/doc_test/《低压配电设计规范》GB 50054-2011.pdf"
-    chunk(test_pdf,from_page=1, to_page=10, callback=dummy)
+    test_pdf = "examples/doc_test/702-104D702-1常用低压配电设备安装.pdf"
+    chunk(test_pdf,from_page=1, to_page=5, callback=dummy)
 
 
 # if __name__ == "__main__":

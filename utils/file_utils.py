@@ -19,6 +19,7 @@ import os
 import re
 from io import BytesIO
 
+import loguru
 import pdfplumber
 from PIL import Image
 from cachetools import LRUCache, cached
@@ -37,7 +38,8 @@ class FileType(StrEnum):
 PROJECT_BASE = os.getenv("RAG_PROJECT_BASE") or os.getenv("RAG_DEPLOY_BASE")
 RAG_BASE = os.getenv("RAG_BASE")
 
-MODEL_DIR = "D:\\WALLE-AI\\models"
+##模型下载到该项目上级目录
+CACHE_HOME_MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../../')
 
 
 def get_project_base_directory(*args):
@@ -77,7 +79,8 @@ def get_rag_python_directory(*args):
 
 
 def get_home_cache_dir():
-    dir = os.path.join(MODEL_DIR, ".ragflow")
+    dir = os.path.join(CACHE_HOME_MODEL_DIR, ".ragflow")
+    loguru.logger.info(f"cache_dir {dir}")
     try:
         os.mkdir(dir)
     except OSError as error:

@@ -19,8 +19,8 @@ sys.path.insert(
                 os.path.abspath(__file__)),
             '../../')))
 
-from deepdoc.vision.seeit import draw_box
-from deepdoc.vision import Recognizer, LayoutRecognizer, TableStructureRecognizer, OCR, init_in_out
+from vision.seeit import draw_box
+from vision import Recognizer, LayoutRecognizer, TableStructureRecognizer, OCR, init_in_out
 from utils.file_utils import get_project_base_directory
 import argparse
 import re
