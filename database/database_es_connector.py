@@ -1,3 +1,4 @@
+import loguru
 import numpy as np
 from typing import (
     Any,
@@ -159,7 +160,7 @@ class ElasticsearchClient:
                             }
                         }
                     },
-                    "size": ES_BM25_SEARCH_SIZE
+                    "size": "ES_BM25_SEARCH_size设置检索的操作"
                 }
             elif field == 'file_id':
                 query_body = {
@@ -225,3 +226,7 @@ class ElasticsearchClient:
             debug_logger.error(f"Error delete chunks: {e}")
         
         debug_logger.info(f"success to delete chunks: {ids} in index: {index_name}")
+
+if __name__=="__main__":
+    loguru.logger.info(f"test es crud action")
+
