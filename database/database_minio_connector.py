@@ -97,11 +97,11 @@ class MinioClient(object):
         return
 
 
-MINIO = RAGFlowMinio()
+MINIO = MinioClient()
 
 
 if __name__ == "__main__":
-    conn = RAGFlowMinio()
+    conn = MinioClient()
     fnm = "/opt/home/kevinhu/docgpt/upload/13/11-408.jpg"
     from PIL import Image
     img = Image.open(fnm)

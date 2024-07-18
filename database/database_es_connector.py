@@ -1,4 +1,3 @@
-import loguru
 import numpy as np
 from typing import (
     Any,
@@ -11,7 +10,8 @@ from typing import (
 )
 from copy import deepcopy
 from loguru import  logger  as debug_logger
-# from qanything_kernel.configs.model_config import ES_HOST_LOCAL, ES_CLOUD_ID, ES_USER, ES_PASSWORD, ES_API_KEY, ES_CONNECT_PARAMS, ES_SIGNATURE, ES_BM25_SEARCH_SIZE
+
+from conf.database_config import ES_CLIENT_CONFIG
 
 try:
     from elasticsearch import Elasticsearch, helpers
@@ -30,10 +30,10 @@ class ElasticsearchClient:
     """
     def __init__(self, 
         index_name: List[str] = None, 
-        url="ES_HOST_LOCAL", cloud_id="ES_CLOUD_ID",
-        user="ES_USER", password="ES_PASSWORD",
-        api_key="ES_API_KEY",
-        connect_params: Dict[str, Any]="ES_CONNECT_PARAMS"
+        url=ES_CLIENT_CONFIG["ES_HOST_LOCAL"], cloud_id=ES_CLIENT_CONFIG["ES_CLOUD_ID"],
+        user=ES_CLIENT_CONFIG["ES_USER"], password=ES_CLIENT_CONFIG["ES_PASSWORD"],
+        api_key=ES_CLIENT_CONFIG["ES_API_KEY"],
+        connect_params: Dict[str, Any]=ES_CLIENT_CONFIG["ES_CONNECT_PARAMS"]
         ):
 
         if index_name is None:
@@ -160,7 +160,7 @@ class ElasticsearchClient:
                             }
                         }
                     },
-                    "size": "ES_BM25_SEARCH_size设置检索的操作"
+                    "size": ES_CLIENT_CONFIG["ES_BM25_SEARCH_SIZE"]
                 }
             elif field == 'file_id':
                 query_body = {
@@ -226,7 +226,3 @@ class ElasticsearchClient:
             debug_logger.error(f"Error delete chunks: {e}")
         
         debug_logger.info(f"success to delete chunks: {ids} in index: {index_name}")
-
-if __name__=="__main__":
-    loguru.logger.info(f"test es crud action")
-

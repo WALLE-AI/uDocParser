@@ -5,9 +5,9 @@ from database.database_minio_connector import MinioClient
 from database.database_mysql_connector import MysqlClient
 
 DatabaseConnector = {
-    "MysqlClient": AliYunOSSClient,
+    "MysqlClient": MysqlClient,
     "ElasticsearchClient": ElasticsearchClient,
     "MilvusClient": MilvusClient,
     "MinioClient": MinioClient,
-    "AliyunOSSClient": MysqlClient
+    "AliyunOSSClient": AliYunOSSClient
 }
