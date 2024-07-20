@@ -21,7 +21,6 @@ Cargo.lock
 *.png
 *.html
 *.jpg
-*.txt
 .idea/
 .vscode/
 models
