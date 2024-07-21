@@ -20,6 +20,18 @@ from huggingface_hub import snapshot_download
 from utils.file_utils import get_project_base_directory
 from vision import Recognizer
 
+##https://github.com/360AILAB-NLP/360LayoutAnalysis
+class LayoutRecognizer360():
+    def __init__(self):
+        pass
+
+
+##参考https://github.com/opendatalab/PDF-Extract-Kit
+class PdfExtractKit():
+    def __init__(self):
+        pass
+
+
 
 class LayoutRecognizer(Recognizer):
     labels = [

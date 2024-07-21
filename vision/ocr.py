@@ -464,6 +464,13 @@ class TextDetector(object):
 
         return dt_boxes, time.time() - st
 
+##里面有关于paddleocr集成的代码https://github.com/opendatalab/PDF-Extract-Kit and https://github.com/PaddlePaddle/PaddleOCR ocr都需要进行sorted才行
+class PaddleOCR():
+    def __init__(self):
+        pass
+
+
+
 
 class OCR(object):
     def __init__(self, model_dir=None):

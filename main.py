@@ -6,4 +6,4 @@ from test.test_llm import test_llm_chat, test_openrouter_llm, test_llm_siliconfl
 from test.test_rerank import test_rerank_model
 
 if __name__=="__main__":
-    test_rerank_model()
+    test_pdf_parser_chunk()
