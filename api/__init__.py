@@ -61,3 +61,4 @@ client_urls_prefix = [
     for dir in pages_dir
     for path in search_pages_path(dir)
 ]
+

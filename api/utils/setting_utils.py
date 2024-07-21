@@ -1,5 +1,15 @@
 from enum import IntEnum, Enum
 
+from strenum import StrEnum
+
+
+class LLMType(StrEnum):
+    CHAT = 'chat'
+    EMBEDDING = 'embedding'
+    SPEECH2TEXT = 'speech2text'
+    IMAGE2TEXT = 'image2text'
+    RERANK = 'rerank'
+
 
 class CustomEnum(Enum):
     @classmethod
