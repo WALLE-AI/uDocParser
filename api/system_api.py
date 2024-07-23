@@ -1,10 +1,3 @@
-#!/usr/bin/python3
-# -*- coding:utf-8 -*-
-# uDocParser
-# PyCharm
-# @Author:gaojing
-# @Time: 2024/7/21 22:12
-
 from timeit import default_timer as timer
 
 from api.utils.api_utils import get_json_result

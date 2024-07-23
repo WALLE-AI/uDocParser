@@ -1,9 +1,3 @@
-#!/usr/bin/python3
-# -*- coding:utf-8 -*-
-# uDocParser
-# PyCharm
-# @Author:gaojing
-# @Time: 2024/7/21 22:29
 from api.utils.api_utils import get_json_result, server_error_response
 
 

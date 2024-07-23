@@ -1,16 +1,4 @@
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
-import copy
+import loguru
 from tika import parser
 import re
 from io import BytesIO
@@ -151,16 +139,35 @@ def chunk(filename, binary=None, from_page=0, to_page=100000,
 
     return res
 
-def test_pdf_parser_chunk():
+def read_pdf_files(pdf_path):
+    '''
+    读取文件夹中所有pdf文件或者pdf文件
+    '''
+    import os
+    import re
+    pdf_files_dict = {}
+    pattern = re.compile(r'.*\.pdf$', re.IGNORECASE)  # 匹配以.pdf结尾的文件名
+    if os.path.isfile(pdf_path):
+        # 如果是PDF文件，直接添加到词典中 TODO 如何直接判断出相对路径和绝对路径
+        file_name = pdf_path.split('\\')[-1].split(".pdf")
+        pdf_files_dict[file_name[0]] = pdf_path
+    elif os.path.isdir(pdf_path):
+        for root, dirs, files in os.walk(pdf_path):
+            for file in files:
+                if pattern.match(file):
+                    file_name = file.split('.pdf')
+                    full_path = os.path.join(root, file)
+                    pdf_files_dict[file_name[0]] = full_path
+
+    return pdf_files_dict
+
+def handbook_parser(pdf_path):
     def dummy(prog=None, msg=""):
         pass
-    test_pdf = "examples/doc_test/线性系统理论(郑大钟第二版).pdf"
-    chunk(test_pdf,from_page=1, to_page=15, callback=dummy)
+    pdf_files_dict = read_pdf_files(pdf_path)
+    for pdf_name,pdf_path in pdf_files_dict.items():
+        loguru.logger.info(f"pdf file name {pdf_name},pdf path {pdf_path}")
+        res = chunk(pdf_path,from_page=1, to_page=5, callback=dummy)
+        for text in res:
+            loguru.logger.info(f"pdf_file_name:{pdf_name},parser result text {text['content_with_weight']}")
 
-
-# if __name__ == "__main__":
-#     import sys
-#
-#     def dummy(prog=None, msg=""):
-#         pass
-#     chunk(sys.argv[1], from_page=1, to_page=10, callback=dummy)
