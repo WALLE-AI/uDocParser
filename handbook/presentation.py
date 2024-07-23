@@ -17,7 +17,7 @@ from io import BytesIO
 from PIL import Image
 
 from llm import tokenize, is_english
-from llm import rag_tokenizer
+from llm.nlp import rag_tokenizer
 from parser import PdfParser, PptParser, PlainParser
 from PyPDF2 import PdfReader as pdf2_read
 

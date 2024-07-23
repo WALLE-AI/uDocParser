@@ -1,6 +1,8 @@
 ##RAG采用管道式封装common function
 from api.utils.api_utils import get_json_result, server_error_response
 
+###关于rag这个部分其实index增上改查参考dify架构设计，应该把udocparse作为extractor一个部分而已
+
 
 @manager.route('/info', methods=['GET'])
 def rag_info():

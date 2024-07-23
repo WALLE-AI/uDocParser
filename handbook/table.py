@@ -20,7 +20,8 @@ from openpyxl import load_workbook
 from dateutil.parser import parse as datetime_parse
 
 # from api.db.services.knowledgebase_service import KnowledgebaseService
-from llm import rag_tokenizer, is_english, tokenize, find_codec
+from llm import tokenize, find_codec
+from llm.nlp import rag_tokenizer
 from parser import ExcelParser
 
 

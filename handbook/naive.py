@@ -16,7 +16,8 @@ from docx import Document
 from timeit import default_timer as timer
 import re
 from parser.pdf_parser import PlainParser
-from llm import rag_tokenizer, naive_merge, tokenize_table, tokenize_chunks, find_codec, concat_img, naive_merge_docx, tokenize_chunks_docx
+from llm import naive_merge, tokenize_table, tokenize_chunks, find_codec, concat_img, naive_merge_docx, tokenize_chunks_docx
+from llm.nlp import rag_tokenizer
 from parser import PdfParser, ExcelParser, DocxParser, HtmlParser, JsonParser, MarkdownParser
 from utils.settings import cron_logger
 from utils import num_tokens_from_string

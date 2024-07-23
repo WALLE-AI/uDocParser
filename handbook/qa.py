@@ -16,7 +16,8 @@ from io import BytesIO
 from timeit import default_timer as timer
 from openpyxl import load_workbook
 from llm import is_english, random_choices, find_codec, qbullets_category, add_positions, has_qbullet, docx_question_level
-from llm import rag_tokenizer, tokenize_table, concat_img
+from llm import tokenize_table, concat_img
+from llm.nlp import rag_tokenizer
 from utils.settings import cron_logger
 from parser import PdfParser, ExcelParser, DocxParser
 from docx import Document

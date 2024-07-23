@@ -18,7 +18,7 @@ import re
 import pandas as pd
 import requests
 # from api.db.services.knowledgebase_service import KnowledgebaseService
-from llm import rag_tokenizer
+from llm.nlp import rag_tokenizer
 from parser.resume import refactor
 from parser.resume import step_one, step_two
 from utils.settings import cron_logger

@@ -12,13 +12,12 @@
 #
 import copy
 import re
-from collections import Counter
 
 from db import ParserType
-from llm import rag_tokenizer, tokenize, tokenize_table, add_positions, bullets_category, title_frequency, tokenize_chunks
+from llm import tokenize, tokenize_table, add_positions, bullets_category, title_frequency, tokenize_chunks
+from llm.nlp import rag_tokenizer
 from parser import PdfParser, PlainParser
 import numpy as np
-from utils import num_tokens_from_string
 
 
 class Pdf(PdfParser):

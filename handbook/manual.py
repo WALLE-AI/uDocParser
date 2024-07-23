@@ -19,10 +19,11 @@ import re
 
 from db import ParserType
 from io import BytesIO
-from llm import rag_tokenizer, tokenize, tokenize_table, add_positions, bullets_category, title_frequency, tokenize_chunks, docx_question_level
-from parser import PdfParser, PlainParser
+from llm import tokenize, tokenize_table, bullets_category, title_frequency, tokenize_chunks, docx_question_level
+from llm.nlp import rag_tokenizer
+from parser import PlainParser
 from utils import num_tokens_from_string
-from parser import PdfParser, ExcelParser, DocxParser
+from parser import PdfParser, DocxParser
 from docx import Document
 from PIL import Image
 

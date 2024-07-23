@@ -20,14 +20,14 @@ import torch
 import re
 import pdfplumber
 import logging
-from PIL import Image, ImageDraw
+from PIL import Image
 import numpy as np
 from timeit import default_timer as timer
 from PyPDF2 import PdfReader as pdf2_read
 
 from utils.file_utils import get_project_base_directory
 from vision import OCR, Recognizer, LayoutRecognizer, TableStructureRecognizer
-from llm import rag_tokenizer
+from llm.nlp import rag_tokenizer
 from copy import deepcopy
 from huggingface_hub import snapshot_download
 

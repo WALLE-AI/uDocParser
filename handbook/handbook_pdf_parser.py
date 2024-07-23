@@ -3,10 +3,9 @@ from tika import parser
 import re
 from io import BytesIO
 
-from llm import bullets_category, is_english, tokenize, remove_contents_table, \
-    hierarchical_merge, make_colon_as_title, naive_merge, random_choices, tokenize_table, add_positions, \
-    tokenize_chunks, find_codec
-from llm import rag_tokenizer
+from llm import bullets_category, is_english, remove_contents_table, \
+    hierarchical_merge, make_colon_as_title, naive_merge, random_choices, tokenize_table, tokenize_chunks, find_codec
+from llm.nlp import rag_tokenizer
 from parser import PdfParser, DocxParser, PlainParser, HtmlParser
 
 

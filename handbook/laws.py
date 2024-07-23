@@ -18,7 +18,7 @@ from docx import Document
 from db import ParserType
 from llm import bullets_category, remove_contents_table, hierarchical_merge, \
     make_colon_as_title, tokenize_chunks, find_codec, docx_question_level
-from llm import rag_tokenizer
+from llm.nlp import rag_tokenizer
 from parser import PdfParser, DocxParser, PlainParser, HtmlParser
 from utils.settings import cron_logger
 
