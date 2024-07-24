@@ -2,8 +2,9 @@ import io
 import re
 import numpy as np
 
+from api.service.llm_service import LLMBundle
+from api.utils.setting_utils import LLMType
 from llm.nlp import rag_tokenizer
-from api.db.services.llm_service import LLMBundle
 from llm.nlp import tokenize
 
 
@@ -18,7 +19,7 @@ def chunk(filename, binary, tenant_id, lang, callback=None, **kwargs):
     eng = lang.lower() == "english"  # is_english(sections)
     try:
         callback(0.1, "USE Sequence2Txt LLM to transcription the audio")
-        seq2txt_mdl = LLMBundle(tenant_id, LLMType.SPEECH2TEXT, lang=lang)
+        seq2txt_mdl = LLMBundle(LLMType.SPEECH2TEXT, lang=lang)
         ans = seq2txt_mdl.transcription(binary)
         callback(0.8, "Sequence2Txt LLM respond: %s ..." % ans[:32])
         tokenize(doc, ans, eng)

@@ -23,25 +23,30 @@ class LLMService(object):
         #     return
         # return objs[0]
 
-    def get_model_config(self,llm_type,llm_name=None):
+    def get_model_config(self,llm_type,llm_name):
         factory_llm_infos = json.load(
             open(
-                os.path.join(get_project_base_directory(), "conf", "llm_factories.json"),
+                os.path.join(get_project_base_directory(), "uDocParser"+"\\conf", "llm_factories.json"),
                 "r",
             )
         )
-
-        return factory_llm_infos
+        result_dict = {
+            "llm_factory":"",
+            "api_key":"",
+            "llm_name":llm_name,
+            "api_base":""
+        }
+        return result_dict
 
     @classmethod
-    def model_instance(cls, uuid_id, llm_type,
+    def model_instance(cls, llm_type,
                        llm_name=None, lang="Chinese"):
 
         '''
         该函数提供的模型单例服务，根据当前用户ID 现在模型类型和模型名称,在想想这块怎么写
         '''
         ##通过获取配置文件来进行集成
-        model_config = cls().get_model_config(llm_type=llm_type,llm_name=llm_name)
+        model_config = cls().get_model_config(llm_type,llm_name)
 
         if llm_type == LLMType.EMBEDDING.value:
             if model_config["llm_factory"] not in EmbeddingModel:
@@ -73,14 +78,11 @@ class LLMService(object):
 
 ##还需要改造这两个类
 class LLMBundle(object):
-    def __init__(self, user_uuid, llm_type, llm_name=None, lang="Chinese"):
-        self.tenant_id = user_uuid
+    def __init__(self,llm_type, llm_name=None, lang="Chinese"):
         self.llm_type = llm_type
         self.llm_name = llm_name
-        self.mdl = LLMService.model_instance(
-            user_uuid, llm_type, llm_name, lang=lang)
-        assert self.mdl, "Can't find mole for {}/{}/{}".format(
-            user_uuid, llm_type, llm_name)
+        self.mdl = LLMService.model_instance(llm_type, llm_name, lang=lang)
+        assert self.mdl, "Can't find mole for {}/{}/{}".format(llm_type, llm_name)
         self.max_length = 512
 
     def encode(self, texts: list, batch_size=32):

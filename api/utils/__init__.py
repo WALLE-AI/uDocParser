@@ -36,7 +36,7 @@ SERVICE_CONF = "service_conf.yaml"
 
 
 def conf_realpath(conf_name):
-    conf_path = f"conf/{conf_name}"
+    conf_path = f"uDocParser\\conf\\{conf_name}"
     return os.path.join(file_utils.get_project_base_directory(), conf_path)
 
 

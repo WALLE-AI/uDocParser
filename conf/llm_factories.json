@@ -1,5 +1,5 @@
 {
-    "factory_llm_infos": [
+    "llm_factory": [
         {
             "name": "OpenAI",
             "logo": "",
