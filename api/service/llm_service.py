@@ -1,8 +1,11 @@
+import json
+import os
 
 import loguru
 
 from api.utils.setting_utils import LLMType
 from llm import EmbeddingModel, RerankModel, CvModel, ChatModel
+from utils.file_utils import get_project_base_directory
 
 
 class LLMService(object):
@@ -21,8 +24,14 @@ class LLMService(object):
         # return objs[0]
 
     def get_model_config(self,llm_type,llm_name=None):
+        factory_llm_infos = json.load(
+            open(
+                os.path.join(get_project_base_directory(), "conf", "llm_factories.json"),
+                "r",
+            )
+        )
 
-        return {}
+        return factory_llm_infos
 
     @classmethod
     def model_instance(cls, uuid_id, llm_type,

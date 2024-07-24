@@ -3,6 +3,8 @@ import json
 import re
 from copy import deepcopy
 
+from api.service.llm_service import LLMService, LLMBundle
+from api.utils.setting_utils import LLMType
 from api.utils.settings import chat_logger, retrievaler
 from handbook.resume import forbidden_select_fields4resume
 from llm.nlp import keyword_extraction
