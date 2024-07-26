@@ -18,24 +18,35 @@ class LLMService(object):
         根据user_uuid和模型名称获取对应key值，这里需要查询数据认证，是否该模型权限
         '''
         pass
-        # objs = cls.query(tenant_id=tenant_id, llm_name=model_name)
-        # if not objs:
-        #     return
-        # return objs[0]
+    
+    def get_model_info(self,llm_dict, llm_name):
+        # 遍历字典中的llm列表
+        for llm in llm_dict.get("llm", []):
+            # 检查llm_name是否与给定的名称匹配
+            if llm.get("llm_name") == llm_name:
+                # 返回匹配的model_type和name
+                return {"model_type": llm.get("model_type"), "name": llm_dict.get("name")}
+        # 如果没有找到匹配的llm_name，返回None
+        return None
 
     def get_model_config(self,llm_type,llm_name):
+        result_dict = {
+            "llm_factory":"BAAI",
+            "api_key":"",
+            "llm_name":llm_name,
+            "api_base":""
+        }
         factory_llm_infos = json.load(
             open(
                 os.path.join(get_project_base_directory(), "uDocParser"+"\\conf", "llm_factories.json"),
                 "r",
             )
         )
-        result_dict = {
-            "llm_factory":"",
-            "api_key":"",
-            "llm_name":llm_name,
-            "api_base":""
-        }
+        model_list = factory_llm_infos['llm_factory']
+        for llm_type_dict in model_list:
+            if llm_type in llm_type_dict.values():
+                result_dict['llm_factory'] = llm_type
+                result_dict['llm_name'] = llm_type_dict['llm'][0]['llm_name']
         return result_dict
 
     @classmethod
