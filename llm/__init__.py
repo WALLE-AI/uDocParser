@@ -71,7 +71,7 @@ CvModel = {
     "ZHIPU-AI": Zhipu4V,
     "Moonshot": LocalCV,
     'Gemini':GeminiCV,
-    "OpenrouterClientCV":OpenrouterClientCV
+    "OpenRouter":OpenrouterClientCV
 }
 
 
@@ -91,7 +91,7 @@ ChatModel = {
     'Gemini' : GeminiChat,
     "Bedrock": BedrockChat,
     "Groq": GroqChat,
-    "Openrouter":OpenrouterClient,
+    "OpenRouter":OpenrouterClient,
     "Siliconflow":SiliconflowClient
 }
 

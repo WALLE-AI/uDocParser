@@ -4,6 +4,7 @@ import os
 import loguru
 
 from api.utils.setting_utils import LLMType
+from conf.database_config import llm_client_key_url_info
 from llm import EmbeddingModel, RerankModel, CvModel, ChatModel
 from utils.file_utils import get_project_base_directory
 
@@ -18,23 +19,14 @@ class LLMService(object):
         根据user_uuid和模型名称获取对应key值，这里需要查询数据认证，是否该模型权限
         '''
         pass
-    
-    def get_model_info(self,llm_dict, llm_name):
-        # 遍历字典中的llm列表
-        for llm in llm_dict.get("llm", []):
-            # 检查llm_name是否与给定的名称匹配
-            if llm.get("llm_name") == llm_name:
-                # 返回匹配的model_type和name
-                return {"model_type": llm.get("model_type"), "name": llm_dict.get("name")}
-        # 如果没有找到匹配的llm_name，返回None
-        return None
 
     def get_model_config(self,llm_type,llm_name):
         result_dict = {
             "llm_factory":"BAAI",
-            "api_key":"",
+            "api_key":"xxx",
             "llm_name":llm_name,
-            "api_base":""
+            "api_base":"xxxx",
+            "model_type":"xxxx"
         }
         factory_llm_infos = json.load(
             open(
@@ -44,9 +36,15 @@ class LLMService(object):
         )
         model_list = factory_llm_infos['llm_factory']
         for llm_type_dict in model_list:
-            if llm_type in llm_type_dict.values():
-                result_dict['llm_factory'] = llm_type
-                result_dict['llm_name'] = llm_type_dict['llm'][0]['llm_name']
+            for llm_dict in llm_type_dict.get('llm'):
+                if llm_name == llm_dict.get("llm_name"):
+                    result_dict['llm_factory']=llm_type_dict.get("name")
+                    key_url = [key_url for key_url in  llm_client_key_url_info if llm_type_dict.get("name") in key_url]
+                    if key_url:
+                        result_dict["api_key"] = key_url[0]['api_key']
+                        result_dict['api_base'] = key_url[0]['base_url']
+                    result_dict['model_type'] = llm_dict.get("model_type")
+                    result_dict['llm_name'] = llm_dict.get("llm_name")
         return result_dict
 
     @classmethod
@@ -60,28 +58,20 @@ class LLMService(object):
         model_config = cls().get_model_config(llm_type,llm_name)
 
         if llm_type == LLMType.EMBEDDING.value:
-            if model_config["llm_factory"] not in EmbeddingModel:
-                return
             return EmbeddingModel[model_config["llm_factory"]](
                 model_config["api_key"], model_config["llm_name"], base_url=model_config["api_base"])
 
         if llm_type == LLMType.RERANK:
-            if model_config["llm_factory"] not in RerankModel:
-                return
             return RerankModel[model_config["llm_factory"]](
                 model_config["api_key"], model_config["llm_name"], base_url=model_config["api_base"])
 
         if llm_type == LLMType.IMAGE2TEXT.value:
-            if model_config["llm_factory"] not in CvModel:
-                return
             return CvModel[model_config["llm_factory"]](
                 model_config["api_key"], model_config["llm_name"], lang,
                 base_url=model_config["api_base"]
             )
 
         if llm_type == LLMType.CHAT.value:
-            if model_config["llm_factory"] not in ChatModel:
-                return
             return ChatModel[model_config["llm_factory"]](
                 model_config["api_key"], model_config["llm_name"], base_url=model_config["api_base"])
 

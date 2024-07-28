@@ -23,3 +23,16 @@ ES_CLIENT_CONFIG = {
     
 }
 
+llm_client_key_url_info = [{
+    "OpenRouter":"OpenRouter",
+    "api_key":os.environ.get("OPENROUTER_API_KEY"),
+    "base_url":"https://openrouter.ai/api/v1"
+    },
+    {
+    "Siliconflow":"Siliconflow",
+    "api_key": os.environ.get("SILICONFLOW_API_KEY"),
+    "base_url": "https://api.siliconflow.cn/v1"
+    }
+]
+
+
