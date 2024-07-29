@@ -261,7 +261,7 @@ def document_parser():
     for _, r in rows.iterrows():
         callback = partial(set_progress, r["id"], r["from_page"], r["to_page"])
         try:
-            embd_mdl = LLMBundle(r["tenant_id"], LLMType.EMBEDDING, llm_name=r["embd_id"], lang=r["language"])
+            embd_mdl = LLMBundle(LLMType.EMBEDDING, llm_name=r["embd_id"], lang=r["language"])
         except Exception as e:
             callback(-1, msg=str(e))
             cron_logger.error(str(e))
@@ -269,7 +269,7 @@ def document_parser():
 
         if r.get("task_type", "") == "raptor":
             try:
-                chat_mdl = LLMBundle(r["tenant_id"], LLMType.CHAT, llm_name=r["llm_id"], lang=r["language"])
+                chat_mdl = LLMBundle(LLMType.CHAT, llm_name=r["llm_id"], lang=r["language"])
                 cks, tk_count = run_raptor(r, chat_mdl, embd_mdl, callback)
             except Exception as e:
                 callback(-1, msg=str(e))

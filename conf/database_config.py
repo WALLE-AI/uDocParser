@@ -35,7 +35,7 @@ llm_client_key_url_info = [{
     },
     {
         "Dashscope":"Dashscope",
-        "api_key": os.envison.get("DASHSCOPE_API_KEY"),
+        "api_key": os.environ.get("DASHSCOPE_API_KEY"),
         "base_url": "xxx"  
     }
 ]

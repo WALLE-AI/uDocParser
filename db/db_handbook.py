@@ -20,9 +20,12 @@ class ChunkTextData(BaseModel):
       text_embedding_id:文本向量ID  --对应向量数据库
       similarity_question:[question1,question2,xxxx]--根据块生成最相似的问题，并且当前块存在该问题的答案信息
       simi_question_embedding_id:相似问题向量ID --对应向量数据库
+      chunk_summary_embedding_id: int = 26246374732747
+      chunk_summary_text:str = model summary text
     }
     '''
     chunk_id: int = 11232323432
+    es_index_name: str = "udocparser_uid"
     chunk_method: dict = {"default": "character", "recursive": "recursive"}
     text: str = '''我是中国人'''
     bbox: List = [801.0, 38.0, 1026.0, 55.0]
@@ -35,6 +38,29 @@ class ChunkTextData(BaseModel):
     text_embedding_id: int = 153545325436
     similarity_question: List[str] = ["我爱中国"]
     simi_question_embedding_id: int = 26246374732747
+    chunk_summary_embedding_id: int = 26246374732747
+    chunk_summary_text:str = '''model summary text'''
+
+
+class FileParser(BaseModel):
+    '''
+    File Data Obeject
+    {
+      file_id:文件名的md5数据
+      file_name:文件名
+      file_path_url:文档存储的服务位置地址，使用pdf.js即可打开
+      position_standard:当前文件属于地方标准还是国家标准，["国家标准","省","市"],可以根据工地所在区域进行，搜索过滤
+      total_page_num:总页码数
+      stadard_label:属于建筑那个大类，比如防水工程、建筑电气
+    }
+    '''
+    parser_id: int
+    file_id: int
+    file_name: str = "广东省市政基础设施工程竣工验收技术资料统一用表（2019版）"
+    file_path_url: str = "http:10.5.12.45/pdf/广东省市政基础设施工程竣工验收技术资料统一用表（2019版）.pdf"
+    position_standard: List[str] = ["广东省"]
+    total_page_num: int
+
 
 
 class FileData(BaseModel):

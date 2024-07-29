@@ -13,7 +13,7 @@ from llm.nlp import rag_tokenizer, query
 import numpy as np
 
 
-def index_name(uid): return f"ragflow_{uid}"
+def index_name(uid): return f"udocparaser_{uid}"
 
 
 class Dealer:
