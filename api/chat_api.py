@@ -10,6 +10,17 @@ def chat_info():
         return get_json_result(data={"test":"hello world"})
     except Exception as e:
         return server_error_response(e)
+    
+
+@manager.route('/cv_completion', methods=['POST'])
+def chat_cv_completion():
+    '''
+    图片识图chat能力
+    '''
+    try:
+        return get_json_result(data={"test":"hello world"})
+    except Exception as e:
+        return server_error_response(e)
 
 
 @manager.route('/completion', methods=['POST'])
