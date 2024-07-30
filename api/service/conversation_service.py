@@ -3,6 +3,8 @@ import json
 import re
 from copy import deepcopy
 
+import loguru
+
 from api.service.llm_service import LLMService, LLMBundle
 from api.utils.setting_utils import LLMType
 from api.utils.settings import chat_logger, retrievaler
@@ -59,76 +61,86 @@ def llm_id2llm_type(llm_id):
                 return llm["model_type"].strip(",")[-1]
 
 
+class DialogConfig():
+    def __init__(self):
+        self.rerank_id = "BAAI/bge-reranker-v2-m3"
+        self.llm_id = "perplexity/llama-3-sonar-large-32k-chat"
+        self.emb_id = "BAAI/bge-large-zh-v1.5"
+        self.tenant_id=""
+        self.kb_ids = ""
+        self.similarity_threshold = ""
+        self.prompt_config = {
+            "self_rag":True,
+            "parameters":[],
+            "empty_response":"",
+            "system":""
+
+
+        }
+
 def chat(dialog, messages, stream=True, **kwargs):
     assert messages[-1]["role"] == "user", "The last content of this conversation is not from user."
-    llm = LLMService.query(llm_name=dialog.llm_id)
-    if not llm:
-        llm = TenantLLMService.query(tenant_id=dialog.tenant_id, llm_name=dialog.llm_id)
-        if not llm:
-            raise LookupError("LLM(%s) not found" % dialog.llm_id)
-        max_tokens = 8192
-    else:
-        max_tokens = llm[0].max_tokens
-    kbs = KnowledgebaseService.get_by_ids(dialog.kb_ids)
-    embd_nms = list(set([kb.embd_id for kb in kbs]))
-    if len(embd_nms) != 1:
-        yield {"answer": "**ERROR**: Knowledge bases use different embedding models.", "reference": []}
-        return {"answer": "**ERROR**: Knowledge bases use different embedding models.", "reference": []}
+    # llm = LLMService.query(llm_name=dialog.llm_id)
+    # if not llm:
+    #     llm = TenantLLMService.query(tenant_id=dialog.tenant_id, llm_name=dialog.llm_id)
+    #     if not llm:
+    #         raise LookupError("LLM(%s) not found" % dialog.llm_id)
+    max_tokens = 8192
+    # else:
+    #     max_tokens = llm[0].max_tokens
+    # kbs = KnowledgebaseService.get_by_ids(dialog.kb_ids)
+    # embd_nms = list(set([kb.embd_id for kb in kbs]))
+    # if len(embd_nms) != 1:
+    #     yield {"answer": "**ERROR**: Knowledge bases use different embedding models.", "reference": []}
+    #     return {"answer": "**ERROR**: Knowledge bases use different embedding models.", "reference": []}
 
     questions = [m["content"] for m in messages if m["role"] == "user"]
-    embd_mdl = LLMBundle(dialog.tenant_id, LLMType.EMBEDDING, embd_nms[0])
-    if llm_id2llm_type(dialog.llm_id) == "image2text":
-        chat_mdl = LLMBundle(dialog.tenant_id, LLMType.IMAGE2TEXT, dialog.llm_id)
-    else:
-        chat_mdl = LLMBundle(dialog.tenant_id, LLMType.CHAT, dialog.llm_id)
+    embd_mdl = LLMBundle(LLMType.EMBEDDING, dialog.emb_id)
+    ##这里判断是否有图片输入 TODO:这个地方可以做双向支持
+    # if llm_id2llm_type(dialog.llm_id) == "image2text":
+    #     chat_mdl = LLMBundle(LLMType.IMAGE2TEXT, dialog.llm_id)
+    # else:
+    chat_mdl = LLMBundle(LLMType.CHAT, dialog.llm_id)
 
     prompt_config = dialog.prompt_config
-    field_map = KnowledgebaseService.get_field_map(dialog.kb_ids)
+    # field_map = KnowledgebaseService.get_field_map(dialog.kb_ids)
     # try to use sql if field mapping is good to go
-    if field_map:
-        chat_logger.info("Use SQL to retrieval:{}".format(questions[-1]))
-        ans = use_sql(questions[-1], field_map, dialog.tenant_id, chat_mdl, prompt_config.get("quote", True))
-        if ans:
-            yield ans
-            return
+    # if field_map:
+    #     chat_logger.info("Use SQL to retrieval:{}".format(questions[-1]))
+    #     ans = use_sql(questions[-1], field_map, dialog.tenant_id, chat_mdl, prompt_config.get("quote", True))
+    #     if ans:
+    #         yield ans
+    #         return
 
-    for p in prompt_config["parameters"]:
-        if p["key"] == "knowledge":
-            continue
-        if p["key"] not in kwargs and not p["optional"]:
-            raise KeyError("Miss parameter: " + p["key"])
-        if p["key"] not in kwargs:
-            prompt_config["system"] = prompt_config["system"].replace(
-                "{%s}" % p["key"], " ")
-
-    rerank_mdl = None
-    if dialog.rerank_id:
-        rerank_mdl = LLMBundle(dialog.tenant_id, LLMType.RERANK, dialog.rerank_id)
+    # for p in prompt_config["parameters"]:
+    #     if p["key"] == "knowledge":
+    #         continue
+    #     if p["key"] not in kwargs and not p["optional"]:
+    #         raise KeyError("Miss parameter: " + p["key"])
+    #     if p["key"] not in kwargs:
+    #         prompt_config["system"] = prompt_config["system"].replace(
+    #             "{%s}" % p["key"], " ")
+    #
+    # rerank_mdl = None
+    # if dialog.rerank_id:
+    #     rerank_mdl = LLMBundle(LLMType.RERANK, dialog.rerank_id)
 
     for _ in range(len(questions) // 2):
         questions.append(questions[-1])
     if "knowledge" not in [p["key"] for p in prompt_config["parameters"]]:
         kbinfos = {"total": 0, "chunks": [], "doc_aggs": []}
-    else:
-        if prompt_config.get("keyword", False):
-            questions[-1] += keyword_extraction(chat_mdl, questions[-1])
-        kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1, dialog.top_n,
-                                        dialog.similarity_threshold,
-                                        dialog.vector_similarity_weight,
-                                        doc_ids=kwargs["doc_ids"].split(",") if "doc_ids" in kwargs else None,
-                                        top=dialog.top_k, aggs=False, rerank_mdl=rerank_mdl)
+    # else:
+    #     if prompt_config.get("keyword", False):
+    questions[-1] += keyword_extraction(chat_mdl, questions[-1])
+    kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,aggs=False, rerank_mdl=None)
     knowledges = [ck["content_with_weight"] for ck in kbinfos["chunks"]]
     # self-rag
     if dialog.prompt_config.get("self_rag") and not relevant(dialog.tenant_id, dialog.llm_id, questions[-1],
                                                              knowledges):
+        ##question改写
         questions[-1] = rewrite(dialog.tenant_id, dialog.llm_id, questions[-1])
-        kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1, dialog.top_n,
-                                        dialog.similarity_threshold,
-                                        dialog.vector_similarity_weight,
-                                        doc_ids=kwargs["doc_ids"].split(",") if "doc_ids" in kwargs else None,
-                                        top=dialog.top_k, aggs
-
-                                        =False, rerank_mdl=rerank_mdl)
+        kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,
+                                        aggs=False, rerank_mdl=None)
         knowledges = [ck["content_with_weight"] for ck in kbinfos["chunks"]]
 
     chat_logger.info(
@@ -357,3 +369,13 @@ def rewrite(tenant_id, llm_id, question):
     """
     ans = chat_mdl.chat(prompt, [{"role": "user", "content": question}], {"temperature": 0.8})
     return ans
+
+
+
+def test_chat():
+    dialog_config = DialogConfig()
+    question = "工程建设标准全文信息系统"
+    message_info = [{"role":"user","content":question}]
+    response_generator = chat(dialog_config,message_info)
+    for text in response_generator:
+        loguru.logger.info(f"response :{text}")

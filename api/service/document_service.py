@@ -8,7 +8,9 @@ import sys
 from functools import partial
 from io import BytesIO
 
+import loguru
 import numpy as np
+import pdfplumber
 from elasticsearch_dsl import Q
 
 from api.service.llm_service import LLMBundle
@@ -16,7 +18,7 @@ from api.utils.setting_utils import LLMType
 from api.utils.settings import retrievaler
 from database.database_es_ragflow_connector import ELASTICSEARCH
 from db import ParserType
-from handbook import naive, paper, presentation, manual, laws, qa, table, resume, picture, one, book, audio
+from handbook import naive, paper, presentation, manual, laws, qa, table, picture, one, book, audio
 from llm.nlp import rag_tokenizer,search
 from utils import rmSpace, num_tokens_from_string
 from utils.file_utils import get_project_base_directory
@@ -35,7 +37,6 @@ FACTORY = {
     ParserType.LAWS.value: laws,
     ParserType.QA.value: qa,
     ParserType.TABLE.value: table,
-    ParserType.RESUME.value: resume,
     ParserType.PICTURE.value: picture,
     ParserType.ONE.value: one,
     ParserType.AUDIO.value: audio
@@ -45,7 +46,7 @@ def set_progress(task_id, from_page=0, to_page=-1,
                  prog=None, msg="Processing..."):
     if prog is not None and prog < 0:
         msg = "[ERROR]" + msg
-    cancel = "TaskService.do_cancel(task_id)"
+    cancel = False
     if cancel:
         msg += " [Canceled]"
         prog = -1
@@ -77,40 +78,41 @@ def build(row):
         row["id"],
         row["from_page"],
         row["to_page"])
+    def dummy(prog=None, msg=""):
+        pass
     chunker = FACTORY[row["parser_id"].lower()]
     try:
         st = timer()
-        bucket, name = "File2DocumentService.get_minio_address(doc_id=row[""doc_id""])"
-        binary = "get_minio_binary(bucket, name)"
-        cron_logger.info(
-            "From minio({}) {}/{}".format(timer() - st, row["location"], row["name"]))
-        cks = chunker.chunk(row["name"], binary=binary, from_page=row["from_page"],
-                            to_page=row["to_page"], lang=row["language"], callback=callback,
-                            kb_id=row["kb_id"], parser_config=row["parser_config"], tenant_id=row["tenant_id"])
-        cron_logger.info(
-            "Chunkking({}) {}/{}".format(timer() - st, row["location"], row["name"]))
+        ##可以从oss服务获取
+        # bucket, name = "File2DocumentService.get_minio_address(doc_id=row[""doc_id""])"
+        # binary = "get_minio_binary(bucket, name)"
+        # loguru.logger.info(
+        #     "From minio({}) {}/{}".format(timer() - st, row["location"], row["name"]))
+        cks = chunker.chunk(row['file_full_path'], from_page=row["from_page"],
+                            to_page=row["to_page"], lang=row["language"], callback=dummy)
+        loguru.logger.info(
+            "Chunkking({}) {}".format(timer() - st, row["file_name"]))
     except TimeoutError as e:
         callback(-1, f"Internal server error: Fetch file timeout. Could you try it again.")
-        cron_logger.error(
-            "Chunkking {}/{}: Fetch file timeout.".format(row["location"], row["name"]))
+        loguru.logger.error(
+            "Chunkking({}) {}".format(timer() - st, row["file_name"]))
         return
     except Exception as e:
         if re.search("(No such file|not found)", str(e)):
-            callback(-1, "Can not find file <%s>" % row["name"])
+            callback(-1, "Can not find file <%s>" % row["file_name"])
         else:
             callback(-1, f"Internal server error: %s" %
                      str(e).replace("'", ""))
         # traceback.print_exc()
 
-        cron_logger.error(
-            "Chunkking {}/{}: {}".format(row["location"], row["name"], str(e)))
+        loguru.logger.error(
+            "Chunkking {}: {}".format( row["file_name"], str(e)))
 
         return
 
     docs = []
     doc = {
-        "doc_id": row["doc_id"],
-        "kb_id": [str(row["kb_id"])]
+        "doc_id": row["id"]
     }
     el = 0
     for ck in cks:
@@ -135,20 +137,20 @@ def build(row):
         st = timer()
         # MINIO.put(row["kb_id"], d["_id"], output_buffer.getvalue())
         el += timer() - st
-        d["img_id"] = "{}-{}".format(row["kb_id"], d["_id"])
+        d["img_id"] = "{}".format(d["_id"])
         del d["image"]
         docs.append(d)
-    cron_logger.info("MINIO PUT({}):{}".format(row["name"], el))
+    loguru.logger.info("MINIO PUT({}):{}".format(row["file_name"], el))
 
     return docs
 
 
 def init_kb(row):
-    idxnm = search.index_name(row["tenant_id"])
+    idxnm = search.index_name(row["id"])
     if ELASTICSEARCH.indexExist(idxnm):
         return
     return ELASTICSEARCH.createIdx(idxnm, json.load(
-        open(os.path.join(get_project_base_directory(), "conf", "mapping.json"), "r")))
+        open(os.path.join(get_project_base_directory(), "uDocParser\\conf", "mapping.json"), "r")))
 
 
 def embedding(docs, mdl, parser_config={}, callback=None):
@@ -165,7 +167,7 @@ def embedding(docs, mdl, parser_config={}, callback=None):
             else:
                 tts_ = np.concatenate((tts_, vts), axis=0)
             tk_count += c
-            callback(prog=0.6 + 0.1 * (i + 1) / len(tts), msg="")
+            # callback(prog=0.6 + 0.1 * (i + 1) / len(tts), msg="")
         tts = tts_
 
     cnts_ = np.array([])
@@ -176,10 +178,11 @@ def embedding(docs, mdl, parser_config={}, callback=None):
         else:
             cnts_ = np.concatenate((cnts_, vts), axis=0)
         tk_count += c
-        callback(prog=0.7 + 0.2 * (i + 1) / len(cnts), msg="")
+        # callback(prog=0.7 + 0.2 * (i + 1) / len(cnts), msg="")
     cnts = cnts_
-
+    ##文件名称在chunk中权重
     title_w = float(parser_config.get("filename_embd_weight", 0.1))
+
     vects = (title_w * tts + (1 - title_w) *
              cnts) if len(tts) == len(cnts) else cnts
 
@@ -188,6 +191,18 @@ def embedding(docs, mdl, parser_config={}, callback=None):
         v = vects[i].tolist()
         d["q_%d_vec" % len(v)] = v
     return tk_count
+
+
+def get_pdf_info_with_pdfplumber(pdf_path):
+    # 打开PDF文件
+    with pdfplumber.open(pdf_path) as pdf:
+        # 获取页面总数
+        num_pages = len(pdf.pages)
+
+        # 获取文件大小（字节）
+        file_size = os.path.getsize(pdf_path)
+
+    return num_pages, file_size
 
 
 def run_raptor(row, chat_mdl, embd_mdl, callback=None):
@@ -231,34 +246,70 @@ def run_raptor(row, chat_mdl, embd_mdl, callback=None):
     return res, tk_count
 
 
+def file_generator_md5(text):
+    md5 = hashlib.md5()
+    md5.update((text).encode("utf-8"))
+    return md5.hexdigest()
+
 def read_pdf_files(pdf_path):
     '''
     读取文件夹中所有pdf文件或者pdf文件
     '''
     import os
     import re
-    pdf_files_dict = {}
+
     pattern = re.compile(r'.*\.pdf$', re.IGNORECASE)  # 匹配以.pdf结尾的文件名
+    file_info_list = []
     if os.path.isfile(pdf_path):
+        pdf_files_dict = {}
         # 如果是PDF文件，直接添加到词典中 TODO 如何直接判断出相对路径和绝对路径
         file_name = pdf_path.split('\\')[-1].split(".pdf")
-        pdf_files_dict[file_name[0]] = pdf_path
+        pdf_files_dict['file_name'] = file_name[0]
+        pdf_files_dict["file_full_path"] = pdf_path
+        num_pages, file_size = get_pdf_info_with_pdfplumber(pdf_path)
+        file_md5 = file_generator_md5(file_name[0])
+        pdf_files_dict['id'] = file_md5
+        pdf_files_dict["from_page"] = 1
+        pdf_files_dict["to_page"] = 5
+        pdf_files_dict['total_page'] = num_pages
+        pdf_files_dict["size"] = file_size
+        pdf_files_dict['llm_id'] = "perplexity/llama-3-sonar-large-32k-chat"
+        pdf_files_dict["embd_id"] = "BAAI/bge-large-zh-v1.5"
+        pdf_files_dict["language"] = "Chinese"
+        pdf_files_dict['parser_id'] = "book"
+        pdf_files_dict['parser_config'] = {"filename_embd_weight":0.1}
+        file_info_list.append(pdf_files_dict)
     elif os.path.isdir(pdf_path):
         for root, dirs, files in os.walk(pdf_path):
             for file in files:
+                pdf_files_dict = {}
                 if pattern.match(file):
                     file_name = file.split('.pdf')
                     full_path = os.path.join(root, file)
-                    pdf_files_dict[file_name[0]] = full_path
+                    pdf_files_dict['file_name'] = file_name[0]
+                    pdf_files_dict["file_full_path"] = full_path
+                    num_pages, file_size = get_pdf_info_with_pdfplumber(pdf_path)
+                    pdf_files_dict['total_page'] = num_pages
+                    pdf_files_dict["size"] = file_size
+                    file_md5 =file_generator_md5(file_name[0])
+                    pdf_files_dict['id'] = file_md5
+                    pdf_files_dict["from_page"] = 1
+                    pdf_files_dict["to_page"] = 5
+                    pdf_files_dict['llm_id'] = "perplexity/llama-3-sonar-large-32k-chat"
+                    pdf_files_dict["embd_id"] = "BAAI/bge-large-zh-v1.5"
+                    pdf_files_dict["language"] = "Chinese"
+                    pdf_files_dict['parser_id'] = "book"
+                    pdf_files_dict['parser_config'] = {"filename_embd_weight": 0.1}
+                    file_info_list.append(pdf_files_dict)
+    return file_info_list
 
-    return pdf_files_dict
 
-def document_parser():
-    rows = read_pdf_files()
-    if len(rows) == 0:
+def document_parser(file_path_or_dir):
+    file_info_list = read_pdf_files(file_path_or_dir)
+    if len(file_info_list) == 0:
         return
 
-    for _, r in rows.iterrows():
+    for r in file_info_list:
         callback = partial(set_progress, r["id"], r["from_page"], r["to_page"])
         try:
             embd_mdl = LLMBundle(LLMType.EMBEDDING, llm_name=r["embd_id"], lang=r["language"])
@@ -278,7 +329,7 @@ def document_parser():
         else:
             st = timer()
             cks = build(r)
-            cron_logger.info("Build chunks({}): {}".format(r["name"], timer() - st))
+            loguru.logger.info("Build chunks({}): {}".format(r["file_name"], timer() - st))
             if cks is None:
                 continue
             if not cks:
@@ -291,12 +342,12 @@ def document_parser():
                     len(cks))
             st = timer()
             try:
-                tk_count = embedding(cks, embd_mdl, r["parser_config"], callback)
+                tk_count = embedding(cks, embd_mdl, parser_config=r['parser_config'],callback=callback)
             except Exception as e:
                 callback(-1, "Embedding error:{}".format(str(e)))
                 cron_logger.error(str(e))
                 tk_count = 0
-            cron_logger.info("Embedding elapsed({}): {:.2f}".format(r["name"], timer() - st))
+            cron_logger.info("Embedding elapsed({}): {:.2f}".format(r["file_name"], timer() - st))
             callback(msg="Finished embedding({:.2f})! Start to build index!".format(timer() - st))
 
         init_kb(r)
@@ -305,15 +356,15 @@ def document_parser():
         es_r = ""
         es_bulk_size = 16
         for b in range(0, len(cks), es_bulk_size):
-            es_r = ELASTICSEARCH.bulk(cks[b:b + es_bulk_size], search.index_name(r["tenant_id"]))
+            es_r = ELASTICSEARCH.bulk(cks[b:b + es_bulk_size], search.index_name(r["id"]))
             if b % 128 == 0:
                 callback(prog=0.8 + 0.1 * (b + 1) / len(cks), msg="")
 
-        cron_logger.info("Indexing elapsed({}): {:.2f}".format(r["name"], timer() - st))
+        cron_logger.info("Indexing elapsed({}): {:.2f}".format(r["file_name"], timer() - st))
         if es_r:
             callback(-1, "Index failure!")
             ELASTICSEARCH.deleteByQuery(
-                Q("match", doc_id=r["doc_id"]), idxnm=search.index_name(r["tenant_id"]))
+                Q("match", doc_id=r["doc_id"]), idxnm=search.index_name(r["id"]))
             cron_logger.error(str(es_r))
         else:
             # if TaskService.do_cancel(r["id"]):

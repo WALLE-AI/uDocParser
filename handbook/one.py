@@ -13,7 +13,8 @@
 from tika import parser
 from io import BytesIO
 import re
-import laws
+
+from handbook import laws
 from llm import tokenize, find_codec
 from llm.nlp import rag_tokenizer
 from parser import PdfParser, ExcelParser, PlainParser, HtmlParser

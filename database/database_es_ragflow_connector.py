@@ -1,9 +1,3 @@
-#!/usr/bin/python3
-# -*- coding:utf-8 -*-
-# uDocParser
-# PyCharm
-# @Author:gaojing
-# @Time: 2024/7/23 22:42
 import re
 import json
 import time

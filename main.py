@@ -1,3 +1,4 @@
+from api.service.conversation_service import test_chat
 from handbook.handbook_pdf_parser import handbook_parser
 from test.test_aliyun_oss import test_upload_oss
 from test.test_cv_llm import test_cv_llm
@@ -8,4 +9,4 @@ from test.test_pdf_handbook_paraser import test_handbook_parser
 from test.test_rerank import test_rerank_model
 
 if __name__=="__main__":
-    test_llm_serivices()
+    test_chat()

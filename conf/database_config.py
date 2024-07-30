@@ -12,10 +12,10 @@ ALIYUNSTORGE_CONFIG = {
 
 ES_CLIENT_CONFIG = {
     
-    "ES_HOST_LOCAL":"XXX",
+    "ES_HOST_LOCAL":"http://localhost:9200",
     "ES_CLOUD_ID":"", 
-    "ES_USER":"",
-    "ES_PASSWORD":"",
+    "ES_USER":"root",
+    "ES_PASSWORD":"csce_gaojing",
     "ES_API_KEY":"",
     "ES_CONNECT_PARAMS":"",
     "ES_SIGNATURE":"",
