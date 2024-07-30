@@ -7,6 +7,7 @@ from elasticsearch_dsl import Q, Search
 from typing import List, Optional, Dict, Union
 from dataclasses import dataclass
 
+from api.utils.settings import chat_logger
 from utils.settings import es_logger
 from utils import rmSpace
 from llm.nlp import rag_tokenizer, query
@@ -346,7 +347,7 @@ class Dealer:
                "question": question, "vector": True, "topk": top,
                "similarity": similarity_threshold,
                "available_int": 1}
-        sres = self.search(req, index_name(tenant_id), embd_mdl)
+        sres = self.search(req, index_name("a7cee50aa802ab37909c75d8f4911636"), embd_mdl)
 
         if rerank_mdl:
             sim, tsim, vsim = self.rerank_by_model(rerank_mdl,
@@ -378,7 +379,7 @@ class Dealer:
                 "content_with_weight": sres.field[id]["content_with_weight"],
                 "doc_id": sres.field[id]["doc_id"],
                 "docnm_kwd": dnm,
-                "kb_id": sres.field[id]["kb_id"],
+                "kb_id": sres.field[id]["doc_id"],
                 "important_kwd": sres.field[id].get("important_kwd", []),
                 "img_id": sres.field[id].get("img_id", ""),
                 "similarity": sim[i],
@@ -406,7 +407,6 @@ class Dealer:
         return ranks
 
     def sql_retrieval(self, sql, fetch_size=128, format="json"):
-        from utils.settings import chat_logger
         sql = re.sub(r"[ `]+", " ", sql)
         sql = sql.replace("%", "")
         es_logger.info(f"Get es sql: {sql}")

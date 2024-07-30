@@ -53,9 +53,9 @@ def message_fit_in(msg, max_length=4000):
 
 
 def llm_id2llm_type(llm_id):
-    fnm = os.path.join(get_project_base_directory(), "conf")
+    fnm = os.path.join(get_project_base_directory(), "uDocParser\\conf")
     llm_factories = json.load(open(os.path.join(fnm, "llm_factories.json"), "r"))
-    for llm_factory in llm_factories["factory_llm_infos"]:
+    for llm_factory in llm_factories["llm_factory"]:
         for llm in llm_factory["llm"]:
             if llm_id == llm["llm_name"]:
                 return llm["model_type"].strip(",")[-1]
@@ -69,6 +69,7 @@ class DialogConfig():
         self.tenant_id=""
         self.kb_ids = ""
         self.similarity_threshold = ""
+        self.vector_similarity_weight=0.3
         self.prompt_config = {
             "self_rag":True,
             "parameters":[],
@@ -77,8 +78,12 @@ class DialogConfig():
 
 
         }
+        self.llm_setting = {
 
-def chat(dialog, messages, stream=True, **kwargs):
+
+        }
+
+def chat(dialog, messages, stream=False, **kwargs):
     assert messages[-1]["role"] == "user", "The last content of this conversation is not from user."
     # llm = LLMService.query(llm_name=dialog.llm_id)
     # if not llm:
@@ -122,8 +127,8 @@ def chat(dialog, messages, stream=True, **kwargs):
     #             "{%s}" % p["key"], " ")
     #
     # rerank_mdl = None
-    # if dialog.rerank_id:
-    #     rerank_mdl = LLMBundle(LLMType.RERANK, dialog.rerank_id)
+    if dialog.rerank_id:
+        rerank_mdl = LLMBundle(LLMType.RERANK, dialog.rerank_id)
 
     for _ in range(len(questions) // 2):
         questions.append(questions[-1])
@@ -132,7 +137,7 @@ def chat(dialog, messages, stream=True, **kwargs):
     # else:
     #     if prompt_config.get("keyword", False):
     questions[-1] += keyword_extraction(chat_mdl, questions[-1])
-    kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,aggs=False, rerank_mdl=None)
+    kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,5,aggs=False, rerank_mdl=rerank_mdl)
     knowledges = [ck["content_with_weight"] for ck in kbinfos["chunks"]]
     # self-rag
     if dialog.prompt_config.get("self_rag") and not relevant(dialog.tenant_id, dialog.llm_id, questions[-1],
@@ -140,7 +145,7 @@ def chat(dialog, messages, stream=True, **kwargs):
         ##question改写
         questions[-1] = rewrite(dialog.tenant_id, dialog.llm_id, questions[-1])
         kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,
-                                        aggs=False, rerank_mdl=None)
+                                        5,aggs=False, rerank_mdl=rerank_mdl)
         knowledges = [ck["content_with_weight"] for ck in kbinfos["chunks"]]
 
     chat_logger.info(
@@ -332,10 +337,10 @@ def use_sql(question, field_map, tenant_id, chat_mdl, quota=True):
 
 
 def relevant(tenant_id, llm_id, question, contents: list):
-    if llm_id2llm_type(llm_id) == "image2text":
-        chat_mdl = LLMBundle(tenant_id, LLMType.IMAGE2TEXT, llm_id)
-    else:
-        chat_mdl = LLMBundle(tenant_id, LLMType.CHAT, llm_id)
+    # if llm_id2llm_type(llm_id) == "image2text":
+    #     chat_mdl = LLMBundle(tenant_id, LLMType.IMAGE2TEXT, llm_id)
+    # else:
+    chat_mdl = LLMBundle(LLMType.CHAT, "perplexity/llama-3-sonar-large-32k-chat")
     prompt = """
         You are a grader assessing relevance of a retrieved document to a user question. 
         It does not need to be a stringent test. The goal is to filter out erroneous retrievals.
@@ -349,15 +354,15 @@ def relevant(tenant_id, llm_id, question, contents: list):
     if num_tokens_from_string(contents) >= chat_mdl.max_length - 4:
         contents = encoder.decode(encoder.encode(contents)[:chat_mdl.max_length - 4])
     ans = chat_mdl.chat(prompt, [{"role": "user", "content": contents}], {"temperature": 0.01})
-    if ans.lower().find("yes") >= 0: return True
+    if "yes" in ans: return True
     return False
 
 
 def rewrite(tenant_id, llm_id, question):
-    if llm_id2llm_type(llm_id) == "image2text":
-        chat_mdl = LLMBundle(tenant_id, LLMType.IMAGE2TEXT, llm_id)
-    else:
-        chat_mdl = LLMBundle(tenant_id, LLMType.CHAT, llm_id)
+    # if llm_id2llm_type(llm_id) == "image2text":
+    #     chat_mdl = LLMBundle(tenant_id, LLMType.IMAGE2TEXT, llm_id)
+    # else:
+    chat_mdl = LLMBundle(LLMType.CHAT, "perplexity/llama-3-sonar-large-32k-chat")
     prompt = """
         You are an expert at query expansion to generate a paraphrasing of a question.
         I can't retrieval relevant information from the knowledge base by using user's question directly.     

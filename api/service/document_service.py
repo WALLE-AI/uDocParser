@@ -78,8 +78,6 @@ def build(row):
         row["id"],
         row["from_page"],
         row["to_page"])
-    def dummy(prog=None, msg=""):
-        pass
     chunker = FACTORY[row["parser_id"].lower()]
     try:
         st = timer()
@@ -89,7 +87,7 @@ def build(row):
         # loguru.logger.info(
         #     "From minio({}) {}/{}".format(timer() - st, row["location"], row["name"]))
         cks = chunker.chunk(row['file_full_path'], from_page=row["from_page"],
-                            to_page=row["to_page"], lang=row["language"], callback=dummy)
+                            to_page=row["to_page"], lang=row["language"], callback=callback)
         loguru.logger.info(
             "Chunkking({}) {}".format(timer() - st, row["file_name"]))
     except TimeoutError as e:
