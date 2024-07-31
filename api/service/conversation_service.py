@@ -70,14 +70,18 @@ class DialogConfig():
         self.kb_ids = ""
         self.similarity_threshold = ""
         self.vector_similarity_weight=0.3
-        self.prompt_config = {
-            "self_rag":True,
-            "parameters":[],
-            "empty_response":"",
-            "system":""
-
-
-        }
+        self.self_rag = True
+        self.prompt_config =  {
+        "system": """你是一个智能助手，请总结知识库的内容来回答问题，请列举知识库中的数据详细回答。当所有知识库内容都与问题无关时，你的回答必须包括“知识库中未找到您要的答案！”这句话。回答需要考虑聊天历史。
+以下是知识库：
+{knowledge}
+以上是知识库。""",
+        "prologue": "您好，我是您的助手小樱，长得可爱又善良，can I help you?",
+        "parameters": [
+            {"key": "knowledge", "optional": False}
+        ],
+        "empty_response": "Sorry! 知识库中未找到相关内容！"
+    }
         self.llm_setting = {
 
 
@@ -127,8 +131,8 @@ def chat(dialog, messages, stream=False, **kwargs):
     #             "{%s}" % p["key"], " ")
     #
     # rerank_mdl = None
-    if dialog.rerank_id:
-        rerank_mdl = LLMBundle(LLMType.RERANK, dialog.rerank_id)
+    # if dialog.rerank_id:
+    #     rerank_mdl = LLMBundle(LLMType.RERANK, dialog.rerank_id)
 
     for _ in range(len(questions) // 2):
         questions.append(questions[-1])
@@ -137,7 +141,7 @@ def chat(dialog, messages, stream=False, **kwargs):
     # else:
     #     if prompt_config.get("keyword", False):
     questions[-1] += keyword_extraction(chat_mdl, questions[-1])
-    kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,5,aggs=False, rerank_mdl=rerank_mdl)
+    kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,5,aggs=False, rerank_mdl=None)
     knowledges = [ck["content_with_weight"] for ck in kbinfos["chunks"]]
     # self-rag
     if dialog.prompt_config.get("self_rag") and not relevant(dialog.tenant_id, dialog.llm_id, questions[-1],
@@ -145,7 +149,7 @@ def chat(dialog, messages, stream=False, **kwargs):
         ##question改写
         questions[-1] = rewrite(dialog.tenant_id, dialog.llm_id, questions[-1])
         kbinfos = retrievaler.retrieval(" ".join(questions), embd_mdl, dialog.tenant_id, dialog.kb_ids, 1,
-                                        5,aggs=False, rerank_mdl=rerank_mdl)
+                                        5,aggs=False, rerank_mdl=None)
         knowledges = [ck["content_with_weight"] for ck in kbinfos["chunks"]]
 
     chat_logger.info(

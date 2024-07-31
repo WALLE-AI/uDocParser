@@ -68,6 +68,7 @@ class FileData(BaseModel):
     File Data Obeject
     {
       file_id:文件名的md5数据
+      kb_id:知识库的ID号
       file_name:文件名
       file_path_url:文档存储的服务位置地址，使用pdf.js即可打开
       position_standard:当前文件属于地方标准还是国家标准，["国家标准","省","市"],可以根据工地所在区域进行，搜索过滤
@@ -76,6 +77,7 @@ class FileData(BaseModel):
     }
     '''
     file_id: int
+    kb_id:str="test"
     file_name: str = "广东省市政基础设施工程竣工验收技术资料统一用表（2019版）"
     file_path_url: str = "http:10.5.12.45/pdf/广东省市政基础设施工程竣工验收技术资料统一用表（2019版）.pdf"
     position_standard: List[str] = ["广东省"]
@@ -98,3 +100,4 @@ class FileDataInforation(BaseModel):
     standard_position_label: str = "国家标准"
     effective_date: str = "2009年4月1日"
     discard_standard_num: str = "GB50108—2001"
+    file_format:str = "pdf"

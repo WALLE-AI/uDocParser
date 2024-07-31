@@ -347,7 +347,7 @@ class Dealer:
                "question": question, "vector": True, "topk": top,
                "similarity": similarity_threshold,
                "available_int": 1}
-        sres = self.search(req, index_name("a7cee50aa802ab37909c75d8f4911636"), embd_mdl)
+        sres = self.search(req, index_name("87e23276b559ce1ae4a591b2f0b97247"), embd_mdl)
 
         if rerank_mdl:
             sim, tsim, vsim = self.rerank_by_model(rerank_mdl,

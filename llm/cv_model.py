@@ -64,9 +64,14 @@ class OpenrouterClientCV(Base):
         self.model_name = model_name
         self.lang = lang
 
-    def describe(self, image, max_tokens=300):
+    def llm_result_postprocess(self,llm_response):
+        from json_repair import repair_json
+        json_string = repair_json(llm_response,return_objects=True)
+        return json_string
+
+    def describe(self, image, max_tokens=300,prompt=None,json_format = None):
         b64 = self.image2base64(image)
-        prompt = self.prompt(b64)
+        prompt = self.prompt(b64,prompt=prompt)
         for i in range(len(prompt)):
             for c in prompt[i]["content"]:
                 if "text" in c: c["type"] = "text"
@@ -76,7 +81,11 @@ class OpenrouterClientCV(Base):
             messages=prompt,
             max_tokens=max_tokens,
         )
-        return res.choices[0].message.content.strip(), res.usage.total_tokens
+        if json_format:
+            result = self.llm_result_postprocess(res.choices[0].message.content.strip())
+        else:
+            result = res.choices[0].message.content.strip()
+        return result , res.usage.total_tokens
 
 
 

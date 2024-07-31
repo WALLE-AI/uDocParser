@@ -15,6 +15,7 @@
 #
 import base64
 import datetime
+import hashlib
 import io
 import json
 import os
@@ -130,6 +131,11 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 def rag_uuid():
     return uuid.uuid1().hex
+
+def generator_md5(text):
+    md5 = hashlib.md5()
+    md5.update((text).encode("utf-8"))
+    return md5.hexdigest()
 
 
 def string_to_bytes(string):

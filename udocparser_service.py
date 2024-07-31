@@ -3,8 +3,8 @@ import signal
 import traceback
 
 import loguru
-from aiohttp.log import access_logger
 from werkzeug import run_simple
+
 from api import app
 
 if __name__ =="__main__":

@@ -14,6 +14,7 @@ import pdfplumber
 from elasticsearch_dsl import Q
 
 from api.service.llm_service import LLMBundle
+from api.utils import generator_md5
 from api.utils.setting_utils import LLMType
 from api.utils.settings import retrievaler
 from database.database_es_ragflow_connector import ELASTICSEARCH
@@ -244,11 +245,6 @@ def run_raptor(row, chat_mdl, embd_mdl, callback=None):
     return res, tk_count
 
 
-def file_generator_md5(text):
-    md5 = hashlib.md5()
-    md5.update((text).encode("utf-8"))
-    return md5.hexdigest()
-
 def read_pdf_files(pdf_path):
     '''
     读取文件夹中所有pdf文件或者pdf文件
@@ -265,7 +261,7 @@ def read_pdf_files(pdf_path):
         pdf_files_dict['file_name'] = file_name[0]
         pdf_files_dict["file_full_path"] = pdf_path
         num_pages, file_size = get_pdf_info_with_pdfplumber(pdf_path)
-        file_md5 = file_generator_md5(file_name[0])
+        file_md5 = generator_md5(file_name[0])
         pdf_files_dict['id'] = file_md5
         pdf_files_dict["from_page"] = 1
         pdf_files_dict["to_page"] = 5
@@ -289,7 +285,7 @@ def read_pdf_files(pdf_path):
                     num_pages, file_size = get_pdf_info_with_pdfplumber(pdf_path)
                     pdf_files_dict['total_page'] = num_pages
                     pdf_files_dict["size"] = file_size
-                    file_md5 =file_generator_md5(file_name[0])
+                    file_md5 =generator_md5(file_name[0])
                     pdf_files_dict['id'] = file_md5
                     pdf_files_dict["from_page"] = 1
                     pdf_files_dict["to_page"] = 5

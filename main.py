@@ -7,6 +7,7 @@ from test.test_llm import test_llm_chat, test_openrouter_llm, test_llm_siliconfl
 from test.test_llm_service import test_llm_serivices
 from test.test_pdf_handbook_paraser import test_handbook_parser
 from test.test_rerank import test_rerank_model
+from test.test_website_content import test_example
 
 if __name__=="__main__":
-    test_chat()
+    test_cv_llm()

@@ -1,6 +1,12 @@
+
+
 from flask import jsonify
 
 from api.utils.setting_utils import RetCode
+
+from flask import json
+##解决json 中文字符乱码的情况
+json.provider.DefaultJSONProvider.ensure_ascii = False
 
 
 def get_json_result(retcode=RetCode.SUCCESS, retmsg='success', data=None):
