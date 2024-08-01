@@ -49,7 +49,7 @@ def resource_doc_upload():
 
 
 @manager.route('/doc/chunk_id', methods=['POST'])
-def resource_info():
+def resource_doc_chunk_id():
     '''
     获取现有rag服务中所有LLM vllm embedding reranker 信息
     '''

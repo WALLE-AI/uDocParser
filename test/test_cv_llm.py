@@ -14,7 +14,7 @@ def get_mime_type(file_path):
     mime_type, _ = mimetypes.guess_type(file_path)
     return mime_type
 def test_cv_llm():
-    images_path = "examples\\images_test\\01.png"
+    images_path = "examples\\images_test\\clipboard_1722496743869_image.png"
     check_result = get_mime_type(images_path)
     cv_model = CvModel['OpenRouter'](key=api_key,model_name=model_name,base_url=base_url)
     with open(images_path, 'rb') as f:
